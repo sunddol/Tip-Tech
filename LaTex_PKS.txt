@@ -1,0 +1,309 @@
+000.Install the LaTex
+001.init.vim Setting : PDF Viewer, TOC
+002.Start up
+003.Environment variable 설정
+004.한글 지원
+005. <Leader>l... series
+006.vimtex useful setting
+099.etc : commands
+===============================================================================
+000.Install the LaTex
+    - http://www.ktug.org/xe/ 한글Tex 사용자 그룹
+    - 윈도우용 : 무설치 TeX배포판인 TnXTeX, 설치폴더는 공백없이
+    - 한글폰트이름 사용 시 TnXTeXLive/texmf.cnf 수정. 아래 utf8 부분주석 처리
+      이 경우 한글파일이름 사용못함. 그냥 D2Coding 쓰자
+        % command_line_encoding=utf8
+===============================================================================
+001.init.vim Setting : PDF Viewer, TOC
+    " settings for sumatraPDF
+    let g:vimtex_view_general_viewer = 'SumatraPDF'
+    let g:vimtex_view_general_options
+        \ = '-reuse-instance -forward-search @tex @line @pdf'
+    let g:vimtex_view_general_options_latexmk = '-reuse-instance'
+
+    " TOC settings
+    let g:vimtex_toc_config = {
+          \ 'name' : 'TOC',
+          \ 'layers' : ['content', 'todo', 'include'],
+          \ 'resize' : 1,
+          \ 'split_width' : 50,
+          \ 'todo_sorted' : 0,
+          \ 'show_help' : 1,
+          \ 'show_numbers' : 1,
+          \ 'mode' : 2,
+          \}
+
+    let g:vimtex_compiler_latexmk = {
+        \ 'backend' : DEPENDS ON SYSTEM (SEE BELOW),
+        \ 'background' : 1,
+        \ 'build_dir' : '',
+        \ 'callback' : 1,
+        \ 'continuous' : 1,
+        \ 'executable' : 'latexmk',
+        \ 'options' : [
+        \   '-verbose',
+        \   '-file-line-error',
+        \   '-synctex=1',
+        \   '-interaction=nonstopmode',
+        \ ],
+        \}
+
+===============================================================================
+002.Start up
+    - 설치환경 : vim 8.1, tnxtex 1.44, vimtex, 추가(luatex.dll, lua53.dll)
+    - vimrc 설정
+        " vimtex, LaTeX Setting
+        let &runtimepath  = '~/.vim/bundle/vimtex,' . &runtimepath
+        let &runtimepath .= ',~/.vim/bundle/vimtex/after'
+
+        if has('win32')
+            let $PATH .= ';' . 'd:\zz\TnXTeX\TnXTeXLive\bin;d:\zz\TnXTeX\TnXTeXLive\bin\win32'
+            "let $PATH .= ';' . 'C:\Strawberry\perl\bin'
+            "let $PYTHONHOME =  'C:\Users\julia\AppData\Local\Programs\Python\Python35'
+        endif
+
+        let g:latex_viewer='SumatraPDF'
+        let g:vimtex_view_general_viewer = 'SumatraPDF'
+        let g:vimtex_view_general_options
+            \ = '-reuse-instance -forward-search @tex @line @pdf'
+        let g:vimtex_view_general_options_latexmk = '-reuse-instance'
+
+        if !exists('g:ycm_semantic_triggers')
+            let g:ycm_semantic_triggers = {}
+        endif
+        let g:ycm_semantic_triggers.tex = g:vimtex#re#youcompleteme
+
+        "nmap <F2> :VimtexCompile
+        "nmap <F3> :VimtexView<CR>
+    - %!TEX TS-program = xelatex
+        CJK 환경에서는 꼭 선언되어야 함
+    - test.tex (한글출력이 안되면, 아래처럼 \usepackage{kotex} 넣을 것)
+        %!TEX TS-program = xelatex
+        % test tex
+        \documentclass{minimal}
+        \usepackage{kotex}
+
+        \begin{document}
+        Hello, world, hey there! babo.
+        ... 한글 english ... 또 한글이다.. 韓자다...
+        \end{document}
+    - \ll :VimtexCompile    \li:VimtexInfo  \lc:VimtexClean     \lv:VimtexView
+
+    """ 아래는 설정시 참고하였던 이런 저런 내용들임
+    - use minimum vimrc
+        set nocompatible
+        let &runtimepath  = '~/.vim/bundle/vimtex,' . &runtimepath
+        let &runtimepath .= ',~/.vim/bundle/vimtex/after'
+        filetype plugin indent on
+        syntax enable
+    - vim --servername VIM -u minivimrc Test.tex
+    - 처음 실행 시 error msg (TnXTeX 포터블 설치후 관련 setting 이 안된상태)
+    - :let g:vintex_view_general_viewer='okular'
+        "test1.tex" 7L, 112C
+        vimtex: Selected viewer is not executable!
+                - Selection:
+                - Please see :h g:vimtex_view_general_viewer
+        vimtex: latexmk is not executable
+        vimtex: Compiler was not initialized!
+        vimtex: bibtex is not executable!
+                bibtex completion is not available!
+
+        [:VimtexInfo]
+        System info
+          OS: Microsoft Windows 7 Enterprise K  (6.1.7601 Service Pack 1 빌드 7601)
+          Vim version: VIM 8.1 (1)
+          Has clientserver: true
+          Servername: VIM
+
+        vimtex project: test1
+          base: test1.tex
+          root: D:\myWork\study\VIM_Cmder_LaTex\LaTex_Test
+          tex: D:\myWork\study\VIM_Cmder_LaTex\LaTex_Test\test1.tex
+          out:
+          log:
+          aux:
+          fls:
+          qf: LaTeX logfile
+            config:
+              fix_paths: 1
+              packages:
+                default: 1
+              default: 1
+          document class: article
+
+    - minivimrc 수정후 (set PATH=%PATH%;d:\zz\TnXTeX\TnXTeXLive\bin;d:\zz\TnXTeX\TnXTeXLive\bin\win32)
+        if has('win32')
+            let $PATH .= ';' . 'd:\zz\TnXTeX\TnXTeXLive\bin;d:\zz\TnXTeX\TnXTeXLive\bin\win32'
+            "let $PATH .= ';' . 'C:\Strawberry\perl\bin'
+            "let $PYTHONHOME =  'C:\Users\julia\AppData\Local\Programs\Python\Python35'
+        endif
+
+        let g:latex_viewer='SumatraPDF'
+        let g:vimtex_view_general_viewer = 'SumatraPDF'
+        let g:vimtex_view_general_options
+            \ = '-reuse-instance -forward-search @tex @line @pdf'
+        let g:vimtex_view_general_options_latexmk = '-reuse-instance'
+
+         if !exists('g:ycm_semantic_triggers')
+            let g:ycm_semantic_triggers = {}
+          endif
+          let g:ycm_semantic_triggers.tex = g:vimtex#re#youcompleteme
+
+        nmap <F2> :VimtexCompile
+        nmap <F3> :VimtexView<CR>
+    - :VimtexInfo
+        System info
+          OS: Microsoft Windows 7 Enterprise K  (6.1.7601 Service Pack 1 빌드 7601)
+          Vim version: VIM 8.1 (1)
+          Has clientserver: true
+          Servername: VIM
+
+        vimtex project: test1
+          base: test1.tex
+          root: D:\myWork\study\VIM_Cmder_LaTex\LaTex_Test
+          tex: D:\myWork\study\VIM_Cmder_LaTex\LaTex_Test\test1.tex
+          out:
+          log:
+          aux:
+          fls:
+          compiler: latexmk
+            backend: jobs
+            output: C:\Users\KISUKP~1\AppData\Local\Temp\VIA16F4.tmp
+            configuration:
+              continuous: 1
+              callback: 1
+              latexmk options:
+                -verbose
+                -file-line-error
+                -synctex=1
+                -interaction=nonstopmode
+              latexmk engine: -pdf
+            job: process 15124 dead
+            cmd: set max_print_line=2000 & latexmk -verbose -file-line-error -synctex=1 -interaction=nonstopmo
+          viewer: General
+          qf: LaTeX logfile
+            config:
+              fix_paths: 1
+              packages:
+                default: 1
+              default: 1
+          document class: minimal
+
+    - after using xelatex
+          tex program: xelatex
+          compiler: latexmk
+            backend: jobs
+            output: C:\Users\KISUKP~1\AppData\Local\Temp\VIA40B3.tmp
+            configuration:
+              continuous: 1
+              callback: 1
+              latexmk options:
+                -verbose
+                -file-line-error
+                -synctex=1
+                -interaction=nonstopmode
+              latexmk engine: -xelatex
+            job: process 10476 dead
+            cmd: set max_print_line=2000 & latexmk -verbose -file-line-error -synctex=1 -interaction=nonstopmode -
+          viewer: General
+          qf: LaTeX logfile
+            config:
+              fix_paths: 1
+          qf: LaTeX logfile
+            config:
+              fix_paths: 1
+              packages:
+                default: 1
+              default: 1
+          document class: minimal
+
+    - xelatek or lualatex
+    Hi. You should be able to use Xelatex or Luatex. However, this should be specified in your latexmkrc file, for example:
+    $pdflatex = 'xelatex --shell-escape %O %S';
+
+    - 기타 파일들
+    http://minimals.contextgarden.net/current/bin/luatex/mswin/bin/
+    luatex.dll lua53dll
+===============================================================================
+003.Environment variable 설정
+    Path=D:\zz\TnXTeX\TnXTeXLive\bin\win32;D:\zz\TnXTeX\TnXTeXLive\bin;D:\zz\TnXTeX\TnXTeXLive\tlpkg\tlgs\bin
+    TNXTEXFOLDER=D:\zz\TnXTeX\TnXTeXLive\bin
+    TXTEXTEMP=C:\Windows\temp
+    TXTEXVERSION=1.4.4
+===============================================================================
+004.한글 지원
+    - set fenc=utf-8 로 할것. cp949 로 하면 한글 표시 안됨
+    소스를 보여주시면 더 좋겠습니다. 오버리프에서 한글 작성을 해 보지 않으셨나요?
+
+    \documentclass{book}
+    \usepackage{kotex}
+
+    또는
+
+    \documentclass{oblivoir}
+
+    또는
+
+    \setmainfont{한글폰트이름}
+
+    이렇게 하면 한글이 나옵니다. 만약 이렇게 했는데도 나오지 않는다면 폰트 캐시를 하지 않았거나 부적절하게 된 것입니다. 명령행을 열고 다음과 같이 명령을 내려 보세요.
+    #>fc-cache -v -r
+===============================================================================
+005. <Leader>l... series
+   <localleader>li  |<plug>(vimtex-info)|                           `n`
+   <localleader>lI  |<plug>(vimtex-info-full)|                      `n`
+   <localleader>lt  |<plug>(vimtex-toc-open)|                       `n`
+   <localleader>lT  |<plug>(vimtex-toc-toggle)|                     `n`
+   <localleader>lq  |<plug>(vimtex-log)|                            `n`
+   <localleader>lv  |<plug>(vimtex-view)|                           `n`
+   <localleader>lr  |<plug>(vimtex-reverse-search)|                 `n`
+   <localleader>ll  |<plug>(vimtex-compile)|                        `n`
+   <localleader>lL  |<plug>(vimtex-compile-selected)|               `nx`
+   <localleader>lk  |<plug>(vimtex-stop)|                           `n`
+   <localleader>lK  |<plug>(vimtex-stop-all)|                       `n`
+   <localleader>le  |<plug>(vimtex-errors)|                         `n`
+   <localleader>lo  |<plug>(vimtex-compile-output)|                 `n`
+   <localleader>lg  |<plug>(vimtex-status)|                         `n`
+   <localleader>lG  |<plug>(vimtex-status-all)|                     `n`
+   <localleader>lc  |<plug>(vimtex-clean)|                          `n`
+   <localleader>lC  |<plug>(vimtex-clean-full)|                     `n`
+   <localleader>lm  |<plug>(vimtex-imaps-list)|                     `n`
+   <localleader>lx  |<plug>(vimtex-reload)|                         `n`
+   <localleader>lX  |<plug>(vimtex-reload-state)|                   `n`
+   <localleader>ls  |<plug>(vimtex-toggle-main)|                    `n`
+
+===============================================================================
+006.vimtex useful setting
+    - https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/
+    - After typing \begin{ENV}, how do we automatically close it with \end{ENV}? With vimtex, you can press ]] in insert mode to auto-close an environment 
+        cse: change an environment
+        dse: delete an environment
+        tse：toggle stared env and no-star env, e.g., change from equation* to equation and vice versa.
+        ]]: close an environment (only work in insert mode, in normal mode, it will bring cursor to next subsection instead). After you have typed begin{ENV}, use ]] to auto-close it with \end{ENV}
+        For more mappings, see :h vimtex-default-mappings.
+        :VimtexInfo: show all relevant info about current LaTeX project.
+        :VimtexTocOpen: show table of contents window
+        :VimtexTocToggle: toggle table of contents window
+        :VimtexCompile: Compile the current LaTeX source file and opens the viewer after successful compilation.
+        :VimtexStop: Stop compilation for the current project.
+        :VimtexClean: clean auxiliary files generated in compliation process.
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+099.etc : commands
+    :VimtexInfo: show all relevant info about current LaTeX project.
+    :VimtexTocOpen: show table of contents window
+    :VimtexTocToggle: toggle table of contents window
+    :VimtexCompile: Compile the current LaTeX source file and opens the viewer after successful compilation.
+    :VimtexStop: Stop compilation for the current project.
+    :VimtexClean: clean auxiliary files generated in compliation process
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================

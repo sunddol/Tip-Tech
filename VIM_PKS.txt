@@ -1,0 +1,320 @@
+# my tips for vim
+000.Learning VIM
+001.Run Async Shell Commands in Vim 8.0 / NeoVim and Output to Quickfix Window
+002.Install Vundle 
+003.Could not load library python36.dll
+004.Open file in existing window using total commander
+005.airline use
+006.default textwidth=78 unsetting
+007.backup, writebackup, swapfile
+008.status line setting
+009.NERDTree drive letter change
+010.Neovim transitionn and XDG environment variable
+011.copy, paste is not working with windows clipboard
+012.syntax highlight for plain text
+013.Append output of an external command
+014.Using register
+ 
+===============================================================================
+000.Learning VIM
+    - https://github.com/vim/vim-win32-installer/releases
+        . Nightly Vim Windows build snapshots
+        . The easiest and best solution for Windows users on 32-bit systems is to use the standard Vim at http://sourceforge.net/projects/cream/files/Vim/
+    - https://realpython.com/vim-and-python-a-match-made-in-heaven/ 
+한글의 줄과 각을 살린 나눔고딕코딩은 신흥강자. 한글이 대수가 아닐 땐 스테디셀러인 콘솔라스(Consolas)나 픽스드시스(FixedSys)를, 맥에선 모나코(Monaco)를, 리눅스에선 베라산스모노(Vera Sans Mono)를 써보자. 
+
+" 2 lines below should be placed in top of file to work properly in _vimrc
+- set enc=utf-8 과 메뉴 파일 충돌이 있어, 아래 2줄은 꼭 최상단에 위치
+set langmenu=en_US      " difficulty in setting lang menu into english, 20190322
+lang mes en_us.utf-8            " message in english, en_US
+
+===============================================================================
+001.Run Async Shell Commands in Vim 8.0 / NeoVim and Output to Quickfix Window
+    https://github.com/skywind3000/asyncrun.vim
+===============================================================================
+002.Install Vundle 
+    1.git install. URL: http://gitforwindows.org/
+        - cmd> git --version 으로 확인
+    2.$HOME 설정 - 추가 plugin 관리용 폴더. 백업/재설치 용이
+        - $HOME 환경변수 설정 : 제어판-시스템-고급시스템설정-환경변수
+            변수이름 : HOME
+            변수값   : d:\WinUt\XDG\Vundle
+            setx HOME "d:\WinUt\XDG\Vundle"     <= 관리자 계정으로 실행
+        - cmd 창에서 확인 : echo %HOME%
+        echo %HOME%         <-- HOME 환경변수 확인  제대로 변경되었는지 
+        mkdir d:\WinUt\XDG\Vundle           (neovim, XDG 세팅과 일치시킴)
+        d:
+        cd %HOME%
+        mkdir .vim          <-- .vim 디렉토리 생성 ( 리눅스와 호환을 위해 .vim 디렉토리를 만듭니다.)
+        cd .vim             <-- .vim 디렉토리 이동
+        mkdir bundle        <-- bundle 디렉토리 생성 ( vundle 이 사용할 디렉토리 생성 !!! 중요합니다. !!!)
+        cd bundle
+        mkdir Vundle.vim <-- Vundle.vim 디렉토리 생성  (꼭 Vundle.vim 을 만드시길 바랍니다)
+        cd Vundle.vim    <-- Vundle.vim 로 이동 (이곳에서 git clone을 하셔야 합니다)
+        git clone https://github.com/VundleVim/Vundle.vim.git  .            <-- vundle 설치  제일 마지막에 .(쩜) 꼭 넣어주세요
+    3.Vundle setting
+        - _vimrc
+        set rtp+=~/.vim
+        set rtp+=~/.vim/bundle/Vundle.vim
+        call vundle#begin('~/.vim/bundle')
+        Plugin 'VundleVim/Vundle.vim'
+        call vundle#end()
+        - :PluginInstall 로 확인 
+    4.Plugin Install/Remove
+        - Install
+            .vimawesome 에서 Github repo 명 확인 (https://vimawesome.com)
+            ._vimrc 수정
+                call vundle#begin
+                Plugin 'Github repo 명'
+                call vundle#end
+            .so %
+            .:PluginInstall
+        - Remove
+            ._vimrc 수정
+                삭제할 Plugin 명령 삭제 혹은 주석 처리
+            .:PluginClean
+        - :PluginList
+    기타.curl.cmd, c:\Program Files\Git\cmd\curl.cmd
+        @rem Do not use "echo off" to not affect any child calls.
+        @setlocal
+
+        @rem Get the abolute path to the parent directory, which is assumed to be the
+        @rem Git installation root.
+        @for /F "delims=" %%I in ("%~dp0..") do @set git_install_root=%%~fI
+        @set PATH=%git_install_root%\bin;%git_install_root%\mingw\bin;%PATH%
+
+        @if not exist "%HOME%" @set HOME=%HOMEDRIVE%%HOMEPATH%
+        @if not exist "%HOME%" @set HOME=%USERPROFILE%
+
+        @curl.exe %*
+    3.
+===============================================================================
+003.Could not load library python36.dll
+    - vim 32 bit and python 32 bit 설치버전 확인
+    - :let &pythonthreedll = 'C:\path\to\python36.dll'
+===============================================================================
+004.Open file in existing window using total commander
+    - total commander, option 설정
+    - D:\WinUt\Vim\vim81\gvim.exe --remote-silent  <file name>(혹은)
+    - D:\WinUt\Vim\vim81\gvim.exe --remote-silent +e <file name>(<= 추천)
+    - D:\WinUt\Vim\vim81\gvim.exe --remote-silent +split <file name>(혹은)
+    - D:\WinUt\Vim\vim81\gvim.exe --remote-silent +tabedit <file name>(혹은)
+    - D:\WinUt\Vim\vim81\gvim.exe --remote-tab-silent  <file name>
+    - --qwindowgeometry 800x600     (lines 40, columns 100 설정)
+===============================================================================
+005.airline use
+    - install patched font
+    - set encoding=utf-8      " used in powerline (airline) symbol
+        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h10
+        https://github.com/vim-airline/vim-airline
+        https://github.com/naver/d2codingfont (d2coding supports airline symbol)
+        let g:airline_powerline_fonts = 1
+        Q. Powerline symbols are not showing up.
+        A. First, you must install patched powerline fonts. Second, you must enable
+        unicode in vim.  >
+        set encoding=utf-8
+
+===============================================================================
+===============================================================================
+006.default textwidth=78 unsetting
+    - vimrc_default.vim 내에 textwidth=78 이 강제설정되어 있어 이를 해제할 것
+===============================================================================
+007.backup, writebackup, swapfile
+    - set backup, nobackup
+    - set writebackup, nowritebackup
+    - set swapfile, noswapfile
+    - set undodir=~/.vim/.undo//
+    - set backupdir=~/.vim/.backup//
+    - set directory=~/.vim/.swp//
+    - the "//" at the end of each directory means that file names will be built from the complete path to the file with all path separators substituted to percent "%" sign. This will ensure file name uniqueness in the preserve directory.
+
+===============================================================================
+008.status line setting
+    :set statusline=%<%f\ %h%m%r%=%{\"[\".&ff.\"][\".(&fenc==\"\"?&enc:&fenc).((exists(\"+bomb\")\ &&\&bomb)?\",B\":\"\").\"]\ \"}%k\ %-14.(%l,%c%V%)\ %P
+===============================================================================
+009.NERDTree drive letter change
+    :NERDTree C:
+===============================================================================
+010.Neovim transitionn and XDG environment variable
+    https://github.com/neovim/neovim/wiki/Installing-Neovim#windows
+    https://github.com/equalsraf/neovim-qt/wiki
+    - mkdir D:\WinUt\XDG                        (XDG 환경변수 root 로 쓰임)
+    - setx XDG_CONFIG_HOME D:\WinUt\XDG
+    - mkdir D:\WinUt\XDG\nvim                   (init.vim 저장위치)
+    - D:\WinUt\XDG\nvim\init.vim 생성
+     
+    - :checkhealth 로 상태 확인
+    - get neovim stable release
+    - nvim stores standard configuration and data in standard locations. :echo stdpath("config")
+      $XDG_CONFIG_HOME means ~/.config
+        CONFIG DIRECTORY (DEFAULT) ~
+                  *$XDG_CONFIG_HOME*            Nvim: stdpath("config")
+            Unix:         ~/.config                   ~/.config/nvim
+            Windows:      ~/AppData/Local             ~/AppData/Local/nvim
+
+    - neovim-remote, provider-python
+        pip3 install --upgrade neovim-remote --trusted-host pypi.org --trusted-host files.pythonhosted.org
+        pip3 install --upgrade pynvim --trusted-host pypi.org --trusted-host files.pythonhosted.org
+
+    - provider-clipboard
+        set clipboard+=unnamedplus
+    - g:python3_host_prog 관련 에러 in :checkhealth
+        let g:python3_host_prog = 'D:\Python3\python.exe'
+       :echo exepath('g:python3-host-prog')
+    - ERROR: g:vimtex_compiler_method (`latexmk`) is not executable!
+        tex file open 시 정상 작동
+        echo $LANG 
+        $ sudo update-locale LANG=en_US.UTF-8
+    - Deja vu font : font not fixed metrics
+        GuiFont! DejaVu\ Sans\ Mono\ for\ Powerline:h10:b    (ginit.vim)
+        :fc-list 에서 폰트이름 확인 (TxXTex 에 포함되어 있음)
+    - airline tab not work
+        :GuiTabline 0 (in ginit.vim, if needed, GuiTabline 1
+        nvim-qt --no-ext-tabline
+    - hard link for _vimrc
+        CMD 관리자권한> mklink /h _vimrc D:\WinUt\XDG\nvim\_vimrc
+            하드 링크 작성: _vimrc <<===>> D:\WinUt\XDG\nvim\_vimrc
+         
+        MKLINK /H 링크이름 파일이름		예 : mklink /h sub.exe c:\gain\main.exe
+            파일에 대한 하드 링크를 만듬. 드라이브가 다른 곳에 하드 링크를 만들면 오류 메시지가 출력됨 
+        하드 링크(Hard Link)
+            파일에 대한 하드 링크이다. 파일을 복사하며, 두개의 파일에 대한 연결점을 유지한다. 
+            따라서 A를 B로 하드 링크하고 A를 바꾸면 B도 바뀌며, B를 바꾸면 A도 바뀐다. 
+    - ??? nvim-qt 별도 tab 으로 파일 열기
+    - WARNING: Could not contact PyPI to get latest version.
+    - ERROR: HTTP request failed: error: curl error with https://pypi.python.org/pypi/pynvim/json: 60
+
+    - nvim-qt open new file in exising tab (--remote-tab-silent)
+        :serverstart())
+    - :terminal doesn't work correctly
+    - Clipboard doesn't work
+        :call GuiClipboard()
+    - Nvim-qt Settings on Windows issue     
+        https://jdhao.github.io/2019/01/17/nvim_qt_settings_on_windows/
+        nvim-qt some_file.txt -- -u init.vim
+        Nvim-qt config file is called ginit.vim 
+    - 기타 사항들 : 참고사항임
+        pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org
+        pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org <package_name>
+        Set-Item WSMan:\localhost\Client\TrustedHosts *.pypi.org
+        Set-Item WSMan:\localhost\Client\TrustedHosts *.files.pythonhosted.org
+        Get-Item WSMan:\localhost\Client\TrustedHosts
+
+
+Transitioning from Vim				*nvim-from-vim*
+
+1. To start the transition, create your |init.vim| (user config) file:
+
+    :call mkdir(stdpath('config'), 'p')
+    :exe 'edit '.stdpath('config').'/init.vim'
+
+2. Add these contents to the file:
+
+    set runtimepath^=~/.vim runtimepath+=~/.vim/after
+    let &packpath = &runtimepath
+    source ~/.vimrc
+
+3. Restart Nvim, your existing Vim config will be loaded.
+
+See |provider-python| and |provider-clipboard| for additional software you
+might need to use some features.
+
+Your Vim configuration might not be entirely Nvim-compatible.
+See |vim-differences| for the full list of changes.
+
+The |'ttymouse'| option, for example, was removed from Nvim (mouse support
+should work without it). If you use the same |vimrc| for Vim and Nvim,
+consider guarding |'ttymouse'| in your configuration like so:
+
+    if !has('nvim')
+        set ttymouse=xterm2
+    endif
+ 
+Conversely, if you have Nvim specific configuration items, you could do
+this:
+
+    if has('nvim')
+        tnoremap <Esc> <C-\><C-n>
+    endif
+ 
+For a more granular approach use YXXYexists()|:
+
+    if exists(':tnoremap')
+        tnoremap <Esc> <C-\><C-n>
+    endif
+ 
+Now you should be able to explore Nvim more comfortably. Check |nvim-features|
+for more information.
+==============================================================================
+011.copy, paste is not working with windows clipboard
+    - 최초 상태
+        set clipboard+=unnamedplus
+        :echo g:clipboard   => undefined variable
+        :checkhealth        => clipboard too found : win32yank
+    - :call GuiClipboard() 이후
+        :echo g:clipboard   => past, copy for custom lambda function (+,*)
+        :checkhealth        => clipboard too found : custom
+        echo g:clipboard['paste']['+']()    => windows clipboard 내용
+        echo g:clipboard['paste']['*']()    => windows clipboard 내용
+        echo getreg('+')                    => vim unnamed clipboard 내용
+        echo getreg('*')                    => vim unnamed clipboard 내용
+
+        set shell=powershell.exe
+        set shellcmdflag=-NoProfile\ -NoLogo\ -NonInteractive\ -Command
+        set shellpipe=|
+        set shellredir=>
+===============================================================================
+012.syntax highlight for plain text
+    - method 1
+        function SetConfType()
+          if !empty(matchstr(getline('1'), '^#\s.*'))
+            set filetype=conf
+          endif
+        endfunction
+        autocmd  BufEnter *.txt call SetConfType()
+                 OR
+        autocmd  BufEnter *.txt set filetype=conf
+    - method 2
+        au BufRead *.txt if getline(1) =~ '^#\s.*' | setlocal ft=javascript.flow | endif
+===============================================================================
+013.Append output of an external command
+    - read !dir     => insert the result of dir
+    - let curdir=system('dir')
+    - let @a=system('dir')
+  Capture ex command output    
+    :redir @a
+    :set all
+    :redir END
+
+013.Append output of an external command
+    - read !dir     => insert the result of dir
+    - let curdir=system('dir')
+  Capture ex command output    
+    :redir @a
+    :set all
+    :redir END
+===============================================================================
+014.Using register
+    - "ayiw : word copy in register a
+    - "ap   : paste with register a
+    - :reg "a : show register a
+    - :delete c ; 현재 행을 잘라내서 register c 에 저장
+    - :put c : register c 내용을 현재 행 밑에 붙여넣기
+    - in ex mode : <Ctrl+R>" paste with unnamed register
+                   <Ctrl+R>a paste with register a
+
+windows clipboard 내용
+windows clipboard 내용windows clipboard 내용
+windows clipboard 내용windows clipboard 내용
+pwindows clipboard windows clipboard 내용내
+windows clipboard 내windows clipboard 내windows clipboard 내용용용용
+windows clipboard 내용
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================
+===============================================================================

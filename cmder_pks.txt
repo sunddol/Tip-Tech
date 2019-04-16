@@ -1,0 +1,26 @@
+# cmder pks tip
+001. Installation
+002. Setting
+003. use gvim inside cmder
+================================================================================
+001. Installation
+1. download full package to use git
+cmder.net
+================================================================================
+002. Setting
+    - General - fonts - Console font : 나눔고딕 or D3Coding
+                        Font charset : Hangul
+    - Startup - environment : set LANG=ko_KR.UTF-8 추가
+
+================================================================================
+003. use gvim inside cmder
+    - Go to Settings > Startup > Tasks
+    - press "+" : 
+    "D:\WinUt\Vim\vim81\gvim.exe" --windowid !ConEmuBackHWND! -new_console
+    "D:\WinUt\Vim\vim81\gvim.exe" --windowid !ConEmuBackHWND! -new_console:sH
+
+================================================================================
+================================================================================
+================================================================================
+================================================================================
+================================================================================
